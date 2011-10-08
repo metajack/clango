@@ -1,8 +1,21 @@
 (ns clango.core
-  (:require [clango.parser :as parser]
+  (:require [clojure.string :as str]
+            [clango.parser :as parser]
             [clango.filters :as filters]))
 
 (def ^:private my-ns *ns*)
+
+(defn- translate-sq-dq [[c & _ :as s]]
+  (if (= c \')
+    (-> s
+        (str/replace "\\'" "'")
+        (str/replace #"^'|'$" "\""))
+    s))
+
+(defn- convert-arg [arg]
+  (if (seq? arg)
+    (read-string (translate-sq-dq (second arg)))
+    (symbol arg)))
 
 (defn- filter-for-name [name]
   (ns-resolve 'clango.filters (symbol name)))
@@ -24,7 +37,7 @@
         (let [[_ n p] f
               flt (filter-for-name n)
               new-res (str (if p
-                             (flt res p)
+                             (flt res (convert-arg p))
                              (flt res)))]
           (if fs
             (recur fs new-res)
