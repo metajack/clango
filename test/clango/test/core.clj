@@ -28,3 +28,13 @@
   {:foo {:bar "asdf"}}
   "{{ foo.bar }}"
   "asdf")
+
+(deftest-template basic-filter-render
+  {:foo "asdf"}
+  "{{ foo|length }}"
+  "4")
+
+(deftest-template double-filter-render
+  {:foo "asdf"}
+  "{{foo|length|length}}"
+  "1")
