@@ -123,3 +123,8 @@
   {:foo 9}
   "{{ foo|divisibleby:3 }}"
   "true")
+
+(deftest-template filesizeformat-filter
+  {:foo 1234}
+  "{{ foo|filesizeformat }}"
+  "1.2 kB")

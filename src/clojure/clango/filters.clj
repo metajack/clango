@@ -44,6 +44,15 @@
 (defn divisibleby [num div]
   (zero? (mod (coerce-int num) (coerce-int div))))
 
+(defn filesizeformat [size]
+  (let [abbrevs ["B" "kB" "MB" "GB" "TB"]
+        sizes (take (count abbrevs) (iterate #(/ % 1000.0) (coerce-int size)))
+        zip (map (fn [x y] [x y]) sizes abbrevs)
+        [sz abr] (core/first (drop-while #(> (core/first %) 1000) zip))]
+    (if (integer? sz)
+      (format "%d %s" sz abr)
+      (format "%.1f %s" sz abr))))
+
 (defn first [x]
   (core/first x))
 
