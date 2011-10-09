@@ -128,3 +128,8 @@
   {:foo 1234}
   "{{ foo|filesizeformat }}"
   "1.2 kB")
+
+(deftest-template fix-ampersands-filter
+  {:foo "as&df&gt;"}
+  "{{ foo|fix_ampersands }}"
+  "as&amp;df&gt;")

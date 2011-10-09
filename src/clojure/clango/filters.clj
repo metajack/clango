@@ -56,6 +56,9 @@
 (defn first [x]
   (core/first x))
 
+(defn fix-ampersands [s]
+  (str/replace s #"&(?!\p{Alpha}+;)" "&amp;"))
+
 (defn join
   ([x]
      (str/join x))
