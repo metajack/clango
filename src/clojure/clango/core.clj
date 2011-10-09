@@ -12,22 +12,29 @@
         (str/replace #"^'|'$" "\""))
     s))
 
-(defn- convert-arg [arg]
-  (if (seq? arg)
-    (read-string (translate-sq-dq (second arg)))
-    (symbol arg)))
-
-(defn- filter-for-name [name]
-  (ns-resolve 'clango.filters (symbol name)))
-
 (defn- lookup [ident context]
   (if (seq? ident)
     (let [[_ a b] ident]
       ((keyword b) (lookup a context)))
     ((keyword ident) context)))
 
+(defn- convert-arg [arg context]
+  (if (seq? arg)
+    (read-string (translate-sq-dq (second arg)))
+    (lookup (symbol arg) context)))
+
+(defn- filter-for-name [name]
+  (ns-resolve 'clango.filters (symbol name)))
+
 (defn- render-raw [_ [text]]
   text)
+
+(defn- apply-filter [filter input param context]
+  (try
+    (str (if param
+           (filter input (convert-arg param context))
+           (filter input)))
+    (catch Exception e "")))
 
 (defn- render-var [context [ident & filters]]
   (let [base (lookup ident context)]
@@ -36,9 +43,7 @@
              res base]
         (let [[_ n p] f
               flt (filter-for-name n)
-              new-res (str (if p
-                             (flt res (convert-arg p))
-                             (flt res)))]
+              new-res (apply-filter flt res p context)]
           (if fs
             (recur fs new-res)
             new-res)))
