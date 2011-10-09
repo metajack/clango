@@ -26,6 +26,11 @@
 (defn cut [s src]
   (str/replace s src ""))
 
+(defn default [s df]
+  (if (str/blank? s)
+    df
+    s))
+
 (defn first [x]
   (core/first x))
 

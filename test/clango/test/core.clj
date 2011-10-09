@@ -98,3 +98,13 @@
   {:foo "asdf asdf"}
   "{{ foo|cut:' ' }}"
   "asdfasdf")
+
+(deftest-template default-filter
+  {:foo ""}
+  "{{ foo|default:'asdf' }}"
+  "asdf")
+
+(deftest-template default-filter-pass
+  {:foo "asdf"}
+  "{{ foo|default:'jkl;' }}"
+  "asdf")
