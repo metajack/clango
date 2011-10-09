@@ -8,6 +8,11 @@
     (Integer/valueOf s)
     (int s)))
 
+(defn- coerce-double [s]
+  (if (string? s)
+    (Double/valueOf s)
+    (double s)))
+
 (defn add [x y]
   (+ (coerce-int x) (coerce-int y)))
 
@@ -58,6 +63,17 @@
 
 (defn fix-ampersands [s]
   (str/replace s #"&(?!\p{Alpha}+;)" "&amp;"))
+
+(defn floatformat
+  ([n]
+     (floatformat n -1))
+  ([n p]
+     (let [num (coerce-double n)
+           pint (coerce-int p)
+           precision (if (and (neg? pint) (== (int num) num))
+                       0
+                       (Math/abs pint))]
+       (format (str "%." precision "f") num))))
 
 (defn join
   ([x]

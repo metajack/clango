@@ -133,3 +133,8 @@
   {:foo "as&df&gt;"}
   "{{ foo|fix_ampersands }}"
   "as&amp;df&gt;")
+
+(deftest-template floatformat-filter
+  {:foo 1.234 :bar 42.0 :baz 13}
+  "{{ foo|floatformat:-3 }} {{ bar|floatformat }} {{ baz|floatformat:2 }}"
+  "1.234 42 13.00")
