@@ -38,3 +38,59 @@
   {:foo "asdf"}
   "{{foo|length|length}}"
   "1")
+
+(deftest-template filtet-param-identifier
+  {:foo 1 :bar 2}
+  "{{ foo|add:bar }}"
+  "3")
+
+(deftest-template first-filter-vector
+  {:foo [1 2 3]}
+  "{{ foo|first }}"
+  "1")
+
+(deftest-template first-filter-string
+  {:foo "asdf"}
+  "{{ foo|first }}"
+  "a")
+
+(deftest-template first-filter-error
+  {:foo 1}
+  "{{ foo|first }}"
+  "")
+
+(deftest-template last-filter
+  {:foo [1 2 3]}
+  "{{ foo|last }}"
+  "3")
+
+(deftest-template join-filter
+  {:foo ["one" "two" "three"]}
+  "{{ foo|join:',' }}"
+  "one,two,three")
+
+(deftest-template join-filter-no-param
+  {:foo ["one" "two" "three"]}
+  "{{ foo|join }}"
+  "onetwothree")
+
+(deftest-template add-filter-integers
+  {:foo 42}
+  "{{ foo|add:10 }}"
+  "52")
+
+(deftest-template add-filter-floats
+  {:foo 42.5}
+  "{{ foo|add:10.5 }}"
+  "52")
+
+(deftest-template addslashes-filter
+  {:foo "asdf\\asdf'asdf\"asdf"}
+  "{{ foo|addslashes }}"
+  "asdf\\\\asdf\\'asdf\\\"asdf")
+
+(deftest-template center-filter
+  {:foo "asdf"}
+  "{{ foo|center:10 }}"
+  "   asdf   ")
+
