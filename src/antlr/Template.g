@@ -83,7 +83,7 @@ value_after_dot : number | IDENTIFIER ;
 filter : IDENTIFIER ( COLON parameter )? 
         -> ^(FILTER IDENTIFIER parameter?) ;
 
-parameter : ( number | string ) ;
+parameter : ( number | string | value ) ;
 
 block : OPEN_BLOCK
         tag_name tag_param*
