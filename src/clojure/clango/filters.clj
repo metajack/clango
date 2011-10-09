@@ -3,9 +3,13 @@
   (:require [clojure.core :as core]
             [clojure.string :as str]))
 
+(defn- coerce-int [s]
+  (if (string? s)
+    (Integer/valueOf s)
+    (int s)))
+
 (defn add [x y]
-  (let [to-integer #(if (string? %) (Integer/valueOf %) (int %))]
-    (+ (to-integer x) (to-integer y))))
+  (+ (coerce-int x) (coerce-int y)))
 
 (defn addslashes [x]
   (-> x
@@ -17,9 +21,10 @@
   (str/capitalize x))
 
 (defn center [s width]
-  (let [lead (int (/ (- width (count s)) 2))
+  (let [w (coerce-int width)
+        lead (int (/ (- w (count s)) 2))
         padding (apply str (take lead (cycle " ")))]
-    (if (odd? width)
+    (if (odd? w)
       (apply str padding s padding " ")
       (apply str padding s padding))))
 
@@ -35,6 +40,9 @@
   (if s
     s
     df))
+
+(defn divisibleby [num div]
+  (zero? (mod (coerce-int num) (coerce-int div))))
 
 (defn first [x]
   (core/first x))

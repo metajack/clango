@@ -118,3 +118,8 @@
   {:foo ""}
   "{{ foo|default_if_none:'asdf' }}"
   "")
+
+(deftest-template divisibleby-filter
+  {:foo 9}
+  "{{ foo|divisibleby:3 }}"
+  "true")
