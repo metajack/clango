@@ -23,6 +23,9 @@
       (apply str padding s padding " ")
       (apply str padding s padding))))
 
+(defn cut [s src]
+  (str/replace s src ""))
+
 (defn first [x]
   (core/first x))
 

@@ -94,3 +94,7 @@
   "{{ foo|center:10 }}"
   "   asdf   ")
 
+(deftest-template cut-filter
+  {:foo "asdf asdf"}
+  "{{ foo|cut:' ' }}"
+  "asdfasdf")
