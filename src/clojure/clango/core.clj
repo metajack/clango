@@ -24,7 +24,7 @@
     (lookup (symbol arg) context)))
 
 (defn- filter-for-name [name]
-  (ns-resolve 'clango.filters (symbol name)))
+  (ns-resolve 'clango.filters (symbol (str/replace name "_" "-"))))
 
 (defn- render-raw [_ [text]]
   text)

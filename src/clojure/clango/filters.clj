@@ -31,6 +31,11 @@
     df
     s))
 
+(defn default-if-none [s df]
+  (if s
+    s
+    df))
+
 (defn first [x]
   (core/first x))
 

@@ -108,3 +108,13 @@
   {:foo "asdf"}
   "{{ foo|default:'jkl;' }}"
   "asdf")
+
+(deftest-template default-if-none-filter
+  {:foo nil}
+  "{{ foo|default_if_none:'asdf' }}"
+  "asdf")
+
+(deftest-template default-if-none-filter-pass
+  {:foo ""}
+  "{{ foo|default_if_none:'asdf' }}"
+  "")
