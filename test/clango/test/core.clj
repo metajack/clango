@@ -138,3 +138,13 @@
   {:foo 1.234 :bar 42.0 :baz 13}
   "{{ foo|floatformat:-3 }} {{ bar|floatformat }} {{ baz|floatformat:2 }}"
   "1.234 42 13.00")
+
+(deftest-template wordcount-filter
+  {:foo "asdf asdf asdf"}
+  "{{ foo|wordcount }}"
+  "3")
+
+(deftest-template yesno-filter
+  {:foo true :bar nil :baz false}
+  "{{ foo|yesno:'yes,no' }},{{ bar|yesno:'yes,no,maybe' }},{{ baz|yesno:'yes,no' }}"
+  "yes,maybe,no")
