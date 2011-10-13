@@ -135,6 +135,9 @@
 (deffilter length [:pass x]
   (count x))
 
+(deffilter upper [:string s]
+  (str/upper-case s))
+
 (deffilter wordcount [:string s]
   (count (str/split s #"\W+")))
 
