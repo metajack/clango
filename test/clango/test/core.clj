@@ -9,6 +9,9 @@
        (is (= ~output (clango/render t# ~context))
            "Tempalte output didn't match given output."))))
 
+(defn render [s ctx]
+  (clango/render (parser/parse s) ctx))
+
 (deftest-template raw-render
   {}
   "asdf"

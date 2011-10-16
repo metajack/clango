@@ -1,9 +1,14 @@
 (ns clango.core
   (:require [clojure.string :as str]
             [clango.parser :as parser]
-            [clango.filters :as filters]))
+            [clango.filters :as filters]
+            [clango.tags :as tags]
+            [clango.util :as util]))
 
 (def ^:private my-ns *ns*)
+(def ^{:private true :dynamic true} *context* {})
+
+(require 'clango.default-filters 'clango.default-tags)
 
 (defn- translate-sq-dq [[c & _ :as s]]
   (if (= c \')
@@ -12,49 +17,49 @@
         (str/replace #"^'|'$" "\""))
     s))
 
-(defn- lookup [ident context]
-  (if (seq? ident)
-    (let [[_ a b] ident]
-      ((keyword b) (lookup a context)))
-    ((keyword ident) context)))
-
-(defn- convert-arg [arg context]
+(defn- convert-arg [context arg]
   (if (seq? arg)
     (read-string (translate-sq-dq (second arg)))
-    (lookup (symbol arg) context)))
+    (util/lookup context (symbol arg))))
 
-(defn- filter-for-name [name]
-  (ns-resolve 'clango.filters (symbol (str/replace name "_" "-"))))
-
-(defn- render-raw [_ [text]]
-  text)
+(defn- render-raw [[text] stack _]
+  [text stack])
 
 (defn- apply-filter [filter input param context]
   (try
     (str (if param
-           (filter input (convert-arg param context))
+           (filter input (convert-arg context param))
            (filter input)))
     (catch Exception e "")))
 
-(defn- render-var [context [ident & filters]]
-  (let [base (lookup ident context)]
+(defn- render-var [[ident & filters] stack context]
+  (let [base (util/lookup context ident)]
     (if (seq? filters)
       (loop [[f & fs] filters
              res base]
         (let [[_ n p] f
-              flt (filter-for-name n)
+              flt (filters/filter-for-name n)
               new-res (apply-filter flt res p context)]
           (if fs
             (recur fs new-res)
-            new-res)))
-      base)))
+            [new-res stack])))
+      [base stack])))
 
-(defn- render-part [[type & parts] context]
+(defn- render-block [[name & parts] stack context]
+  (let [tag (tags/tag-for-name :render name)]
+    (tag context parts stack)))
+
+(defn- render-part [[type & parts] stack context]
   (let [f @(ns-resolve my-ns (symbol (str "render-" (name type))))]
-    (f context parts)))
+    (f parts stack context)))
 
 (defn render [[_ & parts] context]
-  (let [rendered (map #(render-part % context) parts)]
-    (apply str rendered)))
+  (let [parts (tags/compile parts)]
+    (loop [stack parts
+           acc []]
+      (if (seq stack)
+        (let [[res new-stack] (render-part (first stack) (rest stack) context)]
+          (recur new-stack (conj acc res)))
+        (apply str acc)))))
 
 

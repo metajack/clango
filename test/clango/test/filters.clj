@@ -1,6 +1,6 @@
 (ns clango.test.filters
   (:use [clojure.test]
-        [clango.test.core :only [deftest-template]])
+        [clango.test.core :only [deftest-template render]])
   (:require [clango.parser :as parser]
             [clango.core :as clango]))
 
@@ -143,3 +143,7 @@
   {:foo true :bar nil :baz false}
   "{{ foo|yesno:'yes,no' }},{{ bar|yesno:'yes,no,maybe' }},{{ baz|yesno:'yes,no' }}"
   "yes,maybe,no")
+
+(deftest unknown-filter
+  (is (thrown-with-msg? Exception #"^Unknown filter:"
+        (render "{{foo|firstt}}" {:foo "asdf"}))))
