@@ -3,12 +3,12 @@
             [clango.parser :as parser]
             [clango.filters :as filters]
             [clango.tags :as tags]
-            [clango.util :as util]))
+            [clango.util :as util]
+            clango.default-filters
+            clango.default-tags))
 
 (def ^:private my-ns *ns*)
 (def ^{:private true :dynamic true} *context* {})
-
-(require 'clango.default-filters 'clango.default-tags)
 
 (defn- translate-sq-dq [[c & _ :as s]]
   (if (= c \')
