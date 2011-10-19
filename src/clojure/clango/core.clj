@@ -8,7 +8,8 @@
             clango.default-tags))
 
 (def ^:private my-ns *ns*)
-(def ^{:private true :dynamic true} *context* {})
+
+(def ^:dynamic *context* {})
 
 (defn- translate-sq-dq [[c & _ :as s]]
   (if (= c \')
@@ -53,7 +54,7 @@
   (let [f @(ns-resolve my-ns (symbol (str "render-" (name type))))]
     (f parts stack context)))
 
-(defn render [[_ & parts] context]
+(defn render [[_ & parts] & {:keys [context] :or {context *context*}}]
   (let [parts (tags/compile parts)]
     (loop [stack parts
            acc []]
@@ -61,5 +62,3 @@
         (let [[res new-stack] (render-part (first stack) (rest stack) context)]
           (recur new-stack (conj acc res)))
         (apply str acc)))))
-
-
