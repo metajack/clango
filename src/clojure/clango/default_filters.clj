@@ -1,5 +1,5 @@
 (ns clango.default-filters
-  (:refer-clojure :exclude [first last])
+  (:refer-clojure :exclude [first last reverse])
   (:use [clango.filters :only (deffilter)])
   (:require [clojure.core :as core]
             [clojure.string :as str]))
@@ -73,7 +73,16 @@
   (core/last x))
 
 (deffilter length [x]
-  (count x))
+  (str (count x)))
+
+(deffilter limit [x :int n]
+  (take n x))
+
+(deffilter reverse [x]
+  (core/reverse x))
+
+(deffilter skip [x :int n]
+  (drop n x))
 
 (deffilter upper [:string s]
   (str/upper-case s))

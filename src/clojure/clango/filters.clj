@@ -4,11 +4,13 @@
             [clojure.string :as str]
             [clojure.pprint :as pp]))
 
+
+
 (defn filter-for-name [name]
   (if-let [filter (ns-resolve 'clango.default-filters
                               (symbol (str (str/replace name "_" "-"))))]
     filter
-    (throw (Exception. (str "Unknown filter:" name)))))
+    (throw (Exception. (str "Unknown filter: " name)))))
 
 (defn coerce-int [s]
   `(if (string? ~s)

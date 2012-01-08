@@ -65,9 +65,9 @@ NUMBER : { loc.equals("var") || loc.equals("blk") }?=>
 WHITESPACE : { loc.equals("var") || loc.equals("blk") }?=> ( ' ' | '\t' | '\r' | '\n' | '\u000c' )+ ;
 
 // var sections
-DOT : { loc.equals("var") }?=> '.' ;
-PIPE : { loc.equals("var") }?=> '|' ;
-COLON : { loc.equals("var") }?=> ':' ;
+DOT : { loc.equals("var") || loc.equals("blk") }?=> '.' ;
+PIPE : { loc.equals("var") || loc.equals("blk") }?=> '|' ;
+COLON : { loc.equals("var") || loc.equals("blk") }?=> ':' ;
 
 
 fragment DIGIT : '0'..'9' ;
@@ -75,7 +75,7 @@ fragment ALPHA : 'a'..'z' | 'A'..'Z' ;
 
 // block sections
 BLOCK_SYMBOL : { loc.equals("blk") }?=>
-        ( ',' | '|' | '=' | '<' | '>' | '-' | '!' | '@' | '#' | '~'
+        ( ',' | '=' | '<' | '>' | '-' | '!' | '@' | '#' | '~'
         | '+' | '*' | '&' | '^' | '$' | '?' | ';' )+ ;
 
 COMMENT_DATA : { loc.equals("com") }?=> ( { input.LA(2) != '}' }?=> '#' | ~'#' )+ ;
@@ -109,11 +109,11 @@ value_after_dot : number | IDENTIFIER ;
 filter : IDENTIFIER ( WHITESPACE? COLON WHITESPACE? parameter )? 
         -> ^(FILTER IDENTIFIER parameter?) ;
 
-parameter : ( number | string | value ) ;
+parameter : number | string | value ;
 
 block : OPEN_BLOCK
         WHITESPACE?
-        tag_name (WHITESPACE tag_param)*
+        tag_name (WHITESPACE? tag_param)*
         WHITESPACE?
         CLOSE_BLOCK
         -> ^(BLOCK tag_name tag_param*) ;
@@ -124,7 +124,12 @@ comment : OPEN_COMMENT comment_data? CLOSE_COMMENT
 comment_data : COMMENT_DATA ;
 
 tag_name : IDENTIFIER ;
-tag_param : value | string | number | symbol ;
+tag_param : tag_var | string | number | symbol ;
+
+tag_var : value ( WHITESPACE? PIPE WHITESPACE? filter )*
+          -> ^(VAR value filter*)
+        ;
+
 string : STRING -> ^(STR STRING) ;
 number : NUMBER -> ^(NUM NUMBER) ;
 symbol : BLOCK_SYMBOL -> ^(SYM BLOCK_SYMBOL) ;

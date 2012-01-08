@@ -16,4 +16,4 @@
 
 (defn map-store [template-map]
   (fn [name]
-    (find template-map name)))
+    (get template-map name)))

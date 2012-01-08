@@ -1,6 +1,7 @@
 (ns clango.core
   (:require [clojure.string :as str]
             [clango.parser :as parser]
+            [clango.var :as var]
             [clango.filters :as filters]
             [clango.tags :as tags]
             [clango.util :as util]
@@ -11,40 +12,12 @@
 
 (def ^:dynamic *context* {})
 
-(defn- translate-sq-dq [[c & _ :as s]]
-  (if (= c \')
-    (-> s
-        (str/replace "\\'" "'")
-        (str/replace #"^'|'$" "\""))
-    s))
-
-(defn- convert-arg [context arg]
-  (if (seq? arg)
-    (read-string (translate-sq-dq (second arg)))
-    (util/lookup context (symbol arg))))
 
 (defn- render-raw [[text] stack _]
   [text stack])
 
-(defn- apply-filter [filter input param context]
-  (try
-    (str (if param
-           (filter input (convert-arg context param))
-           (filter input)))
-    (catch Exception e "")))
-
-(defn- render-var [[ident & filters] stack context]
-  (let [base (util/lookup context ident)]
-    (if (seq? filters)
-      (loop [[f & fs] filters
-             res base]
-        (let [[_ n p] f
-              flt (filters/filter-for-name n)
-              new-res (apply-filter flt res p context)]
-          (if fs
-            (recur fs new-res)
-            [new-res stack])))
-      [base stack])))
+(defn- render-var [v stack context]
+  [(str (var/process-var (cons :var v) context)) stack])
 
 (defn- render-block [[name & parts] stack context]
   (let [tag (tags/tag-for-name :render name)]
@@ -57,8 +30,12 @@
 (defn render [[_ & parts] & {:keys [context] :or {context *context*}}]
   (let [parts (tags/compile parts)]
     (loop [stack parts
+           ctx context
            acc []]
       (if (seq stack)
-        (let [[res new-stack] (render-part (first stack) (rest stack) context)]
-          (recur new-stack (conj acc res)))
+        (let [[part & next-parts] stack]
+          (if (map? part)
+            (recur next-parts part acc)
+            (let [[res new-stack] (render-part part next-parts ctx)]
+              (recur new-stack ctx (conj acc res)))))
         (apply str acc)))))

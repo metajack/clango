@@ -8,11 +8,11 @@
 (defmacro deftest-template [name context template output]
   `(deftest ~name
      (let [t# (parser/parse ~template)]
-       (is (= ~output (clango/render t# ~context))
+       (is (= ~output (clango/render t# :context ~context))
            "Tempalte output didn't match given output."))))
 
 (defn render [s ctx]
-  (clango/render (parser/parse s) ctx))
+  (clango/render (parser/parse s) :context ctx))
 
 (deftest-template raw-render
   {}
