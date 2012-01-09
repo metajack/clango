@@ -9,7 +9,7 @@
   (let [tag-sym (symbol (str (name typ) "-" (str/replace n "_" "-")))]
     (if-let [tag (ns-resolve (find-ns 'clango.default-tags) tag-sym)]
       tag
-      (throw (Exception. (str "Unknown tag:" n))))))
+      (throw (Exception. (str "Unknown tag: " n))))))
 
 (defn- compile-once [stack]
   (if (seq stack)
@@ -32,7 +32,7 @@
 
 (defn collect-until [tag-names stack]
   (let [tag-names (if (not (set? tag-names))
-                    #{tag-names}
+                    (if tag-names #{tag-names} #{})
                     tag-names)]
     (loop [stack stack
            acc []]

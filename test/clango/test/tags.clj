@@ -8,11 +8,21 @@
 (def store
   (stores/map-store
    {"parent.html.ctl"
-    "{% block content %}{% endblock %}"
+    "{% block content %}...{% endblock %}"
     "child.html.ctl"
     "{% extends 'parent.html.ctl' %}{% block content %}asdf{% endblock %}"
-    "include.html.ctl"
-    "asdf"}))
+    "child-nothing.html.ctl"
+    "{% extends 'parent.html.ctl' %}"
+    "child-super.html.ctl"
+    "{% extends 'parent.html.ctl' %}{% block content %}asdf{{ block.super }}{% endblock %}"
+    "child-child.html.ctl"
+    "{% extends 'child.html.ctl' %}{% block content %}jkl;{% endblock %}"
+    "child-child-super.html.ctl"
+    "{% extends 'child-super.html.ctl' %}{% block content %}jkl;{{ block.super }}{% endblock %}"
+    "raw-include.html.ctl"
+    "asdf"
+    "simple-include.html.ctl"
+    "{{ foo }}"}))
 
 (deftest-template if-tag-false
   {:foo false}
@@ -114,5 +124,43 @@
 
 (deftest-template basic-include
   {:clango.core/template-store store}
-  "{% include 'include.html.ctl' %}"
+  "{% include 'raw-include.html.ctl' %}"
   "asdf")
+
+(deftest-template basic-include
+  {:clango.core/template-store store
+   :foo "jkl;"}
+  "{% include 'simple-include.html.ctl' %}"
+  "jkl;")
+
+(deftest-template basic-extends
+  {:clango.core/template-store store}
+  "{% extends 'raw-include.html.ctl' %}"
+  "asdf")
+
+(defmacro deftest-extends [name tmpl-name output]
+  `(deftest-template
+     ~name
+     {:clango.core/template-store store}
+     (store ~tmpl-name)
+     ~output))
+
+(deftest-extends basic-block
+  "child.html.ctl"
+  "asdf")
+
+(deftest-extends none-block
+  "child-nothing.html.ctl"
+  "...")
+
+(deftest-extends super-block
+  "child-super.html.ctl"
+  "asdf...")
+
+(deftest-extends multi-level-block
+  "child-child.html.ctl"
+  "jkl;")
+
+(deftest-extends multi-super-block
+  "child-child-super.html.ctl"
+  "jkl;asdf...")

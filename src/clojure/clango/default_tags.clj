@@ -78,4 +78,51 @@
 (defn render-include [ctx [tree data] stack]
   (let [template-name (var/process-arg (first tree) ctx)
         template (util/get-template template-name ctx)]
-    ["" (concat (drop 1 template) stack)]))
+    ["" (concat [template] stack)]))
+
+(defn compile-extends [tree stack]
+  (let [[parts _] (tags/collect-until #{} stack)
+        block-nodes (filter #(= (take 2 %) [:block "block"]) parts)
+        blocks (into {} (for [bnode block-nodes]
+                          (let [bname (keyword (second (first (nth bnode 2))))
+                                bbody (:contents (nth bnode 3))]
+                            [bname [bbody]])))]
+    [(list :block "extends" tree {:blocks blocks}) []]))
+
+(defn- add-blocks [old new]
+  (reduce
+   (fn [acc [k v]]
+     (let [oldv (get acc k)]
+       (assoc acc k (concat oldv v))))
+   (if old old {})
+   new))
+
+(defn render-extends [ctx [tree data] stack]
+  (let [template-name (var/process-arg (first tree) ctx)
+        template (util/get-template template-name ctx)
+        root (empty? (filter #(= (take 2 %) [:block "extends"]) (rest template)))
+        blocks (add-blocks (::extends-blocks ctx) (:blocks data))
+        nctx (assoc ctx ::extends-root root ::extends-blocks blocks)]
+    ["" (concat [nctx template] stack)]))
+
+(defn compile-block [tree stack]
+  (let [[contents new-stack] (tags/collect-until "endblock" stack)]
+    [(list :block "block" tree {:contents contents}) (rest new-stack)]))
+
+(defn- expand-block [block]
+  (loop [[b & bs] (first block)
+         acc []]
+    (let [body (if (= b [:var [:. "block" "super"]])
+                 (expand-block (rest block))
+                 [b])]
+      (if (seq bs)
+        (recur bs (into acc body))
+        (into acc body)))))
+
+(defn render-block [ctx [tree data] stack]
+  (if (::extends-root ctx)
+    (let [bname (keyword (second (first tree)))
+          blocks (::extends-blocks ctx)
+          block (concat (get blocks bname []) [(:contents data)])]
+      ["" (concat (expand-block block) stack)])
+    ["" stack]))

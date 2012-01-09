@@ -12,7 +12,6 @@
 
 (def ^:dynamic *context* {})
 
-
 (defn- render-raw [[text] stack _]
   [text stack])
 
@@ -22,6 +21,10 @@
 (defn- render-block [[name & parts] stack context]
   (let [tag (tags/tag-for-name :render name)]
     (tag context parts stack)))
+
+(defn- render-template [parts stack context]
+  (let [parts (tags/compile parts)]
+    ["" (concat parts stack)]))
 
 (defn- render-part [[type & parts] stack context]
   (let [f @(ns-resolve my-ns (symbol (str "render-" (name type))))]
