@@ -12,8 +12,8 @@
      (fn [name]
        (try
          (slurp (path-join root name))
-         (catch IOException e nil)))))
+         (catch IOException e "")))))
 
 (defn map-store [template-map]
   (fn [name]
-    (get template-map name)))
+    (get template-map name "")))
