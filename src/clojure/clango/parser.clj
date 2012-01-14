@@ -13,7 +13,8 @@
         (recur (.nextToken lexer) (conj acc [(.getText token) (.getType token)]))))))
 
 (defn ast [node]
-  (if (zero? (.getChildCount node))
+  (if (and (zero? (.getChildCount node))
+           (.getParent node))
     (.getText node)
     (let [children (map ast (.getChildren node))
           text (.getText node)]
