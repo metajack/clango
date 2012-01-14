@@ -2,7 +2,11 @@
   (:refer-clojure :exclude [first last reverse])
   (:use [clango.filters :only (deffilter)])
   (:require [clojure.core :as core]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clango.util :as util]
+            [net.cgrand.enlive-html :as html])
+  (:import [java.io StringReader]
+           [java.util.regex Pattern]))
 
 (deffilter add [:int x :int y]
   (+ x y))
@@ -25,6 +29,9 @@
 
 (deffilter cut [:string s :string to-cut]
   (str/replace s to-cut ""))
+
+(deffilter date [d :string format]
+  (util/date-format d format))
 
 (deffilter default [:string s :string df]
   (if (str/blank? s)
@@ -83,6 +90,16 @@
 
 (deffilter skip [x :int n]
   (drop n x))
+
+(deffilter truncatewords [x :int n]
+  (->> x
+       (StringReader.)
+       (html/html-resource)
+       (html/texts)
+       (apply str)
+       (re-find (Pattern/compile (str "(\\W*\\w+\\W*){0," n "}")))
+       (first)
+       (str/trim)))
 
 (deffilter upper [:string s]
   (str/upper-case s))

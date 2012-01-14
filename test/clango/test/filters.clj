@@ -2,7 +2,8 @@
   (:use [clojure.test]
         [clango.test.core :only [deftest-template render]])
   (:require [clango.parser :as parser]
-            [clango.core :as clango]))
+            [clango.core :as clango])
+  (:import [java.util Calendar]))
 
 (deftest-template unbound-var-render
   {}
@@ -89,6 +90,13 @@
   "{{ foo|cut:' ' }}"
   "asdfasdf")
 
+(deftest-template date-filter
+  {:date (let [c (doto (Calendar/getInstance)
+                   (.set 2012 1 1 14 15 16))]
+           (.getTime c))}
+  "{{ date|date:'%Y%m%dT%H:%i:%s' }}"
+  "20120201T14:15:16")
+
 (deftest-template default-filter
   {:foo ""}
   "{{ foo|default:'asdf' }}"
@@ -128,6 +136,11 @@
   {:foo 1.234 :bar 42.0 :baz 13}
   "{{ foo|floatformat:-3 }} {{ bar|floatformat }} {{ baz|floatformat:2 }}"
   "1.234 42 13.00")
+
+(deftest-template truncatewords-filter
+  {:foo "This is a <b>bold</b> sentence <i>don't you <a href=\"http://foo.baz.baz\">"}
+  "{{ foo | truncatewords:10 }}"
+  "This is a bold sentence don't you")
 
 (deftest-template upper-filter
   {:foo "asdf"}
