@@ -164,3 +164,8 @@
 (deftest-extends multi-super-block
   "child-child-super.html.ctl"
   "jkl;asdf...")
+
+(deftest-template with-block
+  {:foo "asdf" :baz "1234"}
+  "{% with foo='jkl;', bar=baz %}{{ foo }}{{ bar }}{% endwith %}{{ foo }}"
+  "jkl;1234asdf")

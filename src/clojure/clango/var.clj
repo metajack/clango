@@ -15,6 +15,13 @@
     (read-string (translate-sq-dq (second arg)))
     (util/lookup context (symbol arg))))
 
+(defn value-of [form context]
+  (if-let [[kind val] form]
+    (if (= :var kind)
+      (util/lookup context val)
+      (read-string (translate-sq-dq val)))
+    (util/lookup context form)))
+
 (defn- apply-filter [filter input param context]
   (try
     (if param

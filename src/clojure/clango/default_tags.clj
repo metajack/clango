@@ -126,3 +126,19 @@
           block (concat (get blocks bname []) [(:contents data)])]
       ["" (concat (expand-block block) stack)])
     ["" stack]))
+
+(defn compile-with [tree stack]
+  (let [[contents new-stack] (tags/collect-until "endwith" stack)]
+    [(list :block "with" tree {:contents contents}) (rest new-stack)]))
+
+(defn render-with [ctx [tree data] stack]
+  (let [pairs (filter #(not= % [[:sym ","]])
+                      (partition-by #(= % [:sym ","]) tree))
+        pairs (map (fn [[left eq right]]
+                     (cond
+                      (not= eq [:sym "="]) (throw (Exception. (str "Unexpected symbol " (second eq))))
+                      (not= :var (first left)) (throw (Exception. (str "Expected var but got " left)))
+                      :else [(keyword (second left)) (var/value-of right ctx)]))
+                   pairs)
+        new-ctx (into ctx pairs)]
+    ["" (concat [new-ctx] (:contents data) [ctx] stack)]))

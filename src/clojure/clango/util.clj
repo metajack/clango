@@ -6,8 +6,9 @@
 
 (defn lookup [context ident]
   (if (seq? ident)
-    (let [[_ a b] ident]
-      ((keyword b) (lookup context a)))
+    (if-let [[_ a b] ident]
+      ((keyword b) (lookup context a))
+      (recur context (second ident)))
     (let [res ((keyword ident) context)]
       (try
         @res
