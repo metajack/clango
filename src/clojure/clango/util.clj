@@ -5,13 +5,13 @@
            [java.text SimpleDateFormat]))
 
 (defn lookup [context ident]
-  (let [context (try
-                  @context
-                  (catch Exception e context))]
-    (if (seq? ident)
-      (let [[_ a b] ident]
-        ((keyword b) (lookup context a)))
-      ((keyword ident) context))))
+  (if (seq? ident)
+    (let [[_ a b] ident]
+      ((keyword b) (lookup context a)))
+    (let [res ((keyword ident) context)]
+      (try
+        @res
+       (catch Exception e res)))))
 
 (defn get-template [name ctx]
   (if-let [store (:clango.core/template-store ctx)]
