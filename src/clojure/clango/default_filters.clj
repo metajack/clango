@@ -6,7 +6,8 @@
             [clango.util :as util]
             [net.cgrand.enlive-html :as html])
   (:import [java.io StringReader]
-           [java.util.regex Pattern]))
+           [java.util.regex Pattern]
+           [java.net URLEncoder]))
 
 (deffilter add [:int x :int y]
   (+ x y))
@@ -103,6 +104,9 @@
 
 (deffilter upper [:string s]
   (str/upper-case s))
+
+(deffilter urlencode [:string s]
+  (URLEncoder/encode s "UTF-8"))
 
 (deffilter wordcount [:string s]
   (count (str/split s #"\W+")))

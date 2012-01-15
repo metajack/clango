@@ -147,6 +147,11 @@
   "{{ foo|upper }}"
   "ASDF")
 
+(deftest-template urlencode-filter
+  {:foo "asdf asdf/asdf"}
+  "{{ foo|urlencode }}"
+  "asdf+asdf%2Fasdf")
+
 (deftest-template wordcount-filter
   {:foo "asdf asdf asdf"}
   "{{ foo|wordcount }}"
