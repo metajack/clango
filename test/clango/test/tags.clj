@@ -64,6 +64,71 @@
   "{% if foo.bar %}asdf{% else %}jkl;{% endif %}"
   "asdf")
 
+(deftest-template if-op-equalsequals
+  {:foo "asdf" :bar "jkl;"}
+  "{% if foo == bar %}true{% else %}false{% endif %}"
+  "false")
+
+(deftest-template if-op-bangequals
+  {:foo "asdf" :bar "jkl;"}
+  "{% if foo != bar %}true{% else %}false{% endif %}"
+  "true")
+
+(deftest-template if-op-lessthan
+  {:foo 1 :bar 2}
+  "{% if foo < bar %}true{% else %}false{% endif %}"
+  "true")
+
+(deftest-template if-op-greaterthan
+  {:foo 1 :bar 2}
+  "{% if foo > bar %}true{% else %}false{% endif %}"
+  "false")
+
+(deftest-template if-op-lessthanequals
+  {:foo 1 :bar 2}
+  "{% if foo <= bar %}true{% else %}false{% endif %}"
+  "true")
+
+(deftest-template if-op-greaterthanequals
+  {:foo 1 :bar 2}
+  "{% if foo >= bar %}true{% else %}false{% endif %}"
+  "false")
+
+(deftest-template if-op-in
+  {:foo "asdf" :bar "jkl;asdfjkl;"}
+  "{% if foo in bar %}true{% else %}false{% endif %}"
+  "true")
+
+(deftest-template if-op-not
+  {:foo false}
+  "{% if not foo %}true{% else %}false{% endif %}"
+  "true")
+
+(deftest-template if-op-and
+  {:foo true :bar false}
+  "{% if foo and bar %}true{% else %}false{% endif %}"
+  "false")
+
+(deftest-template if-op-or
+  {:foo true :bar false}
+  "{% if foo or bar %}true{% else %}false{% endif %}"
+  "true")
+
+(deftest-template if-and-before-or
+  {:foo false :bar true :baz false}
+  "{% if foo and bar or baz %}true{% else %}false{% endif %}"
+  "false")
+
+(deftest-template if-empty-is-false-1
+  {:foo []}
+  "{% if foo %}true{% else %}false{% endif %}"
+  "false")
+
+(deftest-template if-empty-is-false-2
+  {:foo ""}
+  "{% if foo %}true{% else %}false{% endif %}"
+  "false")
+
 (deftest unknown-tag
   (is (thrown-with-msg? Exception #"^Unknown tag:"
         (render "{% foo %}" {}))))

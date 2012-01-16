@@ -17,10 +17,63 @@
                {:true-parts true-parts :false-parts []})
          (rest new-stack)]))))
 
+(defmacro if-op-binary [sym f tree else]
+  `(let [[l# r#] (split-with #(not= % [:sym ~sym]) ~tree)]
+     (if (seq r#)
+       (list ~f (resolve-if-tree l#) (resolve-if-tree (rest r#)))
+       ~else)))
+
+(defmacro if-op-unary [sym f tree else]
+  `(if (= [:sym ~sym] (first ~tree))
+     (resolve-if-tree (concat [(list ~f (second ~tree))] (drop 2 ~tree)))
+     ~else))
+
+(defn resolve-if-tree [[h & t :as tree]]
+  (if (seq t)
+    (if-op-binary
+     "==" '= tree
+     (if-op-binary
+      "!=" 'not= tree
+      (if-op-binary
+       "<" '< tree
+       (if-op-binary
+        ">" '> tree
+        (if-op-binary
+         "<=" '<= tree
+         (if-op-binary
+          ">=" '>= tree
+          (if-op-binary
+           "in" #(>= (.indexOf %2 %1) 0) tree
+           (if-op-unary
+            "not" 'not tree
+            (if-op-binary
+             "and" 'and tree
+             (if-op-binary
+              "or" 'or tree
+              (throw (Exception. (str "Unexpected expression: " (apply str (interpose " " tree)))))))))))))))
+    (if (sequential? h)
+      (if (= :sym (first h))
+        (throw (Exception. (str "Unexpected expression: " h)))
+        h)
+      h)))
+
+
 (defn render-if [ctx [tree data] stack]
-  (let [expr (var/process-var (first tree) ctx)
-        parts (if expr (:true-parts data) (:false-parts data))]
-    ["" (concat parts stack)]))
+  (let [tree (for [n tree]
+               (cond
+                (= :sym (first n)) n
+                (= [:var "in"] n) [:sym "in"]
+                (= [:var "not"] n) [:sym "not"]
+                (= [:var "and"] n) [:sym "and"]
+                (= [:var "or"] n) [:sym "or"]
+                :else (let [v (var/value-of n ctx)]
+                        (cond
+                         (sequential? v) (seq v)
+                         (= v "") false
+                         :else v))))]
+    (let [expr (eval (resolve-if-tree tree))
+          parts (if expr (:true-parts data) (:false-parts data))]
+      ["" (concat parts stack)])))
 
 (defn compile-for [tree stack]
   (let [[for-parts new-stack] (tags/collect-until #{"empty" "endfor"} stack)
