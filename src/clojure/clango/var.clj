@@ -18,7 +18,10 @@
 (defn value-of [form context]
   (if-let [[kind val] form]
     (if (= :var kind)
-      (util/lookup context val)
+      (cond
+       (= val "true") true
+       (= val "false") false
+       :else (util/lookup context val))
       (read-string (translate-sq-dq val)))
     (util/lookup context form)))
 
