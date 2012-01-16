@@ -43,23 +43,23 @@
          (if-op-binary
           ">=" '>= tree
           (if-op-binary
-           "in" #(>= (.indexOf %2 %1) 0) tree
+           "in" #(if (= %2 "") false (>= (.indexOf %2 %1) 0)) tree
            (if-op-binary
-            "notin" #(< (.indexOf %2 %1) 0) tree
+            "notin" #(if (= %2 "") false (< (.indexOf %2 %1) 0)) tree
             (if-op-unary
-             "not" 'not tree
+             "not" #(if (= %1 "") false (not %1)) tree
              (if-op-binary
-              "and" 'and tree
+              "and" #(let [a (if (= %1 "") false %1)
+                           b (if (= %2 "") false %2)] (and a b)) tree
               (if-op-binary
-               "or" 'or tree
+               "or" #(let [a (if (= %1 "") false %1)
+                           b (if (= %2 "") false %2)] (or a b)) tree
                (throw (Exception. (str "Unexpected expression: " (apply str (interpose " " tree))))))))))))))))
     (if (sequential? h)
       (if (= :sym (first h))
         (throw (Exception. (str "Unexpected expression: " h)))
         h)
-      (if (= h "")
-        false
-        h))))
+      h)))
 
 (defn if-combine-not-in [tree]
   (loop [[h & t] tree
@@ -83,7 +83,8 @@
                           (seq v)
                           v))))
         tree (if-combine-not-in tree)]
-    (let [expr (eval (resolve-if-tree tree))
+    (let [expr (let [v (eval (resolve-if-tree tree))]
+                 (if (= v "") false v))
           parts (if expr (:true-parts data) (:false-parts data))]
       ["" (concat parts stack)])))
 

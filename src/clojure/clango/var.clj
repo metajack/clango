@@ -21,11 +21,11 @@
       (cond
        (= val "true") true
        (= val "false") false
-       :else (util/lookup context val))
+       :else (let [v (util/lookup context val)]
+               (if (nil? v) "" v)))
       (read-string (translate-sq-dq val)))
-    (if-let [v (util/lookup context form)]
-      v
-      "")))
+    (let [v (util/lookup context form)]
+      (if (nil? v) "" v))))
 
 (defn- apply-filter [filter input param context]
   (try
