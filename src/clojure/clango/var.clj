@@ -23,7 +23,9 @@
        (= val "false") false
        :else (util/lookup context val))
       (read-string (translate-sq-dq val)))
-    (util/lookup context form)))
+    (if-let [v (util/lookup context form)]
+      v
+      "")))
 
 (defn- apply-filter [filter input param context]
   (try

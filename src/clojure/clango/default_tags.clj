@@ -57,7 +57,9 @@
       (if (= :sym (first h))
         (throw (Exception. (str "Unexpected expression: " h)))
         h)
-      h)))
+      (if (= h "")
+        false
+        h))))
 
 (defn if-combine-not-in [tree]
   (loop [[h & t] tree
@@ -77,10 +79,9 @@
                 (= [:var "and"] n) [:sym "and"]
                 (= [:var "or"] n) [:sym "or"]
                 :else (let [v (var/value-of n ctx)]
-                        (cond
-                         (sequential? v) (seq v)
-                         (= v "") false
-                         :else v))))
+                        (if (sequential? v)
+                          (seq v)
+                          v))))
         tree (if-combine-not-in tree)]
     (let [expr (eval (resolve-if-tree tree))
           parts (if expr (:true-parts data) (:false-parts data))]
