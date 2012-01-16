@@ -119,6 +119,11 @@
   "{% if foo and bar or baz %}true{% else %}false{% endif %}"
   "false")
 
+(deftest-template if-op-notin
+  {:foo "asdf" :bar "jklasd"}
+  "{% if foo not in bar %}true{% else %}false{% endif %}"
+  "true")
+
 (deftest-template if-empty-is-false-1
   {:foo []}
   "{% if foo %}true{% else %}false{% endif %}"

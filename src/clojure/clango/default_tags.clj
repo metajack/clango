@@ -44,19 +44,29 @@
           ">=" '>= tree
           (if-op-binary
            "in" #(>= (.indexOf %2 %1) 0) tree
-           (if-op-unary
-            "not" 'not tree
-            (if-op-binary
-             "and" 'and tree
+           (if-op-binary
+            "notin" #(< (.indexOf %2 %1) 0) tree
+            (if-op-unary
+             "not" 'not tree
              (if-op-binary
-              "or" 'or tree
-              (throw (Exception. (str "Unexpected expression: " (apply str (interpose " " tree)))))))))))))))
+              "and" 'and tree
+              (if-op-binary
+               "or" 'or tree
+               (throw (Exception. (str "Unexpected expression: " (apply str (interpose " " tree))))))))))))))))
     (if (sequential? h)
       (if (= :sym (first h))
         (throw (Exception. (str "Unexpected expression: " h)))
         h)
       h)))
 
+(defn if-combine-not-in [tree]
+  (loop [[h & t] tree
+         acc []]
+    (if (seq t)
+      (if (and (= [:sym "not"] h) (= [:sym "in"] (first t)))
+        (recur (rest t) (conj acc [:sym "notin"]))
+        (recur t (conj acc h)))
+      (conj acc h))))
 
 (defn render-if [ctx [tree data] stack]
   (let [tree (for [n tree]
@@ -70,7 +80,8 @@
                         (cond
                          (sequential? v) (seq v)
                          (= v "") false
-                         :else v))))]
+                         :else v))))
+        tree (if-combine-not-in tree)]
     (let [expr (eval (resolve-if-tree tree))
           parts (if expr (:true-parts data) (:false-parts data))]
       ["" (concat parts stack)])))
