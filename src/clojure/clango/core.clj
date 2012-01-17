@@ -44,8 +44,7 @@
         (apply str acc)))))
 
 (defn render-template [name & {:keys [context store] :or {context *context*}}]
-  (let [data (store name)
-        template (parser/parse data)
+  (let [template (store name)
         context (assoc context ::template-store store)]
     (render template :context context)))
 

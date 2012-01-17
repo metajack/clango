@@ -16,8 +16,7 @@
 
 (defn get-template [name ctx]
   (if-let [store (:clango.core/template-store ctx)]
-    (if-let [t (store name)]
-      (parser/parse t))))
+    (store name)))
 
 (defn formatter-split [fmt]
   (lazy-seq
