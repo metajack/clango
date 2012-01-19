@@ -112,7 +112,15 @@
   (count (str/split s #"\W+")))
 
 (deffilter yesno [x :string args]
-  (let [args (str/split args #",")]
-    (cond (and (nil? x) (= (count args) 3)) (nth args 2)
-          x (core/first args)
-          :else (second args))))
+  (let [args (str/split args #",")
+        answers (if (= 3 (count args))
+                  (zipmap [:yes :no :maybe] args)
+                  (zipmap [:yes :no :maybe] (concat args [(second args)])))]
+    (cond
+     (nil? x) (:maybe answers)
+     (or (not x)
+         (= "" x)
+         (when (or (sequential? x)
+                   (associative? x))
+           (seq x))) (:no answers)
+     :else (:yes answers))))
