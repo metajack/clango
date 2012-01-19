@@ -19,7 +19,7 @@
     (let [children (map ast (.getChildren node))
           text (.getText node)]
       (if text
-        (cons (keyword (.toLowerCase  text)) children)
+        (cons (keyword (.toLowerCase text)) children)
         children))))
 
 (defn token-name [type]
