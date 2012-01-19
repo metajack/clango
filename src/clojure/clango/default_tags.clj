@@ -204,7 +204,7 @@
                      (cond
                       (not= eq [:sym "="]) (throw (Exception. (str "Unexpected symbol " (second eq))))
                       (not= :var (first left)) (throw (Exception. (str "Expected var but got " left)))
-                      :else [(keyword (second left)) (var/value-of right ctx)]))
+                      :else [(keyword (second left)) (var/process-var right ctx)]))
                    pairs)
         new-ctx (into ctx pairs)]
     ["" (concat [new-ctx] (:contents data) [ctx] stack)]))

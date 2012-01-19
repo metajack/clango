@@ -16,16 +16,14 @@
     (util/lookup context (symbol arg))))
 
 (defn value-of [form context]
-  (if-let [[kind val] form]
+  (if-let [[kind val & _] form]
     (if (= :var kind)
       (cond
        (= val "true") true
        (= val "false") false
-       :else (let [v (util/lookup context val)]
-               (if (nil? v) "" v)))
+       :else (util/lookup context val))
       (read-string (translate-sq-dq val)))
-    (let [v (util/lookup context form)]
-      (if (nil? v) "" v))))
+    (util/lookup context form)))
 
 (defn- apply-filter [filter input param context]
   (try
@@ -34,10 +32,11 @@
       (filter input))
     (catch Exception e "")))
 
-(defn process-var [[_ ident & filters] context]
+(defn process-var [[_ _ & filters :as var] context]
+  (println "[process-var]" (pr-str var))
   (reduce
    (fn [acc [_ name param]]
      (apply-filter (filters/filter-for-name name) acc param context))
-   (util/lookup context ident)
+   (value-of var context)
    filters))
 

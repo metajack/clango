@@ -3,7 +3,8 @@
         [clango.test.core :only [deftest-template render]])
   (:require [clango.parser :as parser]
             [clango.core :as clango]
-            [clango.stores :as stores]))
+            [clango.stores :as stores])
+  (:import [java.util Calendar]))
 
 (def store
   (stores/map-store
@@ -239,3 +240,10 @@
   {:foo "asdf" :baz "1234"}
   "{% with foo='jkl;', bar=baz %}{{ foo }}{{ bar }}{% endwith %}{{ foo }}"
   "jkl;1234asdf")
+
+(deftest-template with-filter
+  {:foo (-> (doto (Calendar/getInstance)
+              (.set 2012 0 17))
+            (.getTime))}
+  "{% with year=foo|date:'%Y' %}{{ year }}{% endwith %}"
+  "2012")
