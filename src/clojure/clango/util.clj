@@ -4,10 +4,16 @@
   (:import [java.util Calendar]
            [java.text SimpleDateFormat]))
 
+;; for dot lookups try keyword, string, then numeric key
 (defn lookup [context ident]
   (if (seq? ident)
     (if-let [[_ a b] ident]
-      ((keyword b) (lookup context a))
+      (if-let [x (get (lookup context a) (keyword b))]
+        x
+        (if-let [x (get (lookup context a) b)]
+          x
+          (when-let [n (try (Long/valueOf b) (catch Exception e))]
+            (get (lookup context a) n))))
       (recur context (second ident)))
     (let [res ((keyword ident) context)]
       (try

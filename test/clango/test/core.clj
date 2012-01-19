@@ -21,5 +21,10 @@
   "asdf"
   "asdf")
 
+(deftest-template ident-dot-number
+  {:foo ["zero" "one" "two"]}
+  "{{ foo.1 }}"
+  "one")
+
 (deftest bad-var
   (is (thrown? Exception (render "{{foo" {}))))

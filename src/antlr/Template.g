@@ -59,13 +59,15 @@ fragment ESCAPE_SEQ : '\\' . ;
 fragment SQ_STR_PART : ~( '\\' | '\'' )+ ;
 fragment DQ_STR_PART : ~( '\\' | '"' )+ ;
 
+SIGN : ('-' | '+') ;
+
 NUMBER : { loc.equals("var") || loc.equals("blk") }?=>
-        ('-' | '+')? DIGIT+ ('.' DIGIT+)? ( ('e' | 'E') '-'? DIGIT+ )? ;
+        DIGIT+ ;
 
 WHITESPACE : { loc.equals("var") || loc.equals("blk") }?=> ( ' ' | '\t' | '\r' | '\n' | '\u000c' )+ ;
 
 // var sections
-DOT : { loc.equals("var") || loc.equals("blk") }?=> '.' ;
+DOT : { loc.equals("var") || loc.equals("blk") || loc.equals("val") }?=> '.' ;
 PIPE : { loc.equals("var") || loc.equals("blk") }?=> '|' ;
 COLON : { loc.equals("var") || loc.equals("blk") }?=> ':' ;
 
@@ -76,7 +78,7 @@ fragment ALPHA : 'a'..'z' | 'A'..'Z' ;
 // block sections
 BLOCK_SYMBOL : { loc.equals("blk") }?=>
         ( ',' | '=' | '<' | '>' | '-' | '!' | '@' | '#' | '~'
-        | '+' | '*' | '&' | '^' | '$' | '?' | ';' )+ ;
+        | '*' | '&' | '^' | '$' | '?' | ';' | SIGN )+ ;
 
 COMMENT_DATA : { loc.equals("com") }?=> ( { input.LA(2) != '}' }?=> '#' | ~'#' )+ ;
 DATA : { loc.equals("out") }?=> ( { input.LA(2) != '{'  &&
@@ -104,7 +106,7 @@ var : OPEN_VAR
 
 value : IDENTIFIER ( DOT^ value_after_dot )* ;
 
-value_after_dot : number | IDENTIFIER ;
+value_after_dot : NUMBER | IDENTIFIER ;
 
 filter : IDENTIFIER ( WHITESPACE? COLON WHITESPACE? parameter )? 
         -> ^(FILTER IDENTIFIER parameter?) ;
@@ -131,5 +133,12 @@ tag_var : value ( WHITESPACE? PIPE WHITESPACE? filter )*
         ;
 
 string : STRING -> ^(STR STRING) ;
-number : NUMBER -> ^(NUM NUMBER) ;
+number : s=SIGN? n1=NUMBER (d=DOT n2=NUMBER)?
+        { CommonTree node = new CommonTree(new CommonToken(NUM, "NUM"));
+          node.addChild(new CommonTree(new CommonToken(NUM, 
+                                                       ($s!=null?$s.text:"") +
+                                                       $n1.text +
+                                                       ($d!=null?$d.text:"") +
+                                                       ($n2!=null?$n2.text:"")))); }
+        -> { node } ;
 symbol : BLOCK_SYMBOL -> ^(SYM BLOCK_SYMBOL) ;
