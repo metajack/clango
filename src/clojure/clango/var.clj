@@ -33,7 +33,6 @@
     (catch Exception e "")))
 
 (defn process-var [[_ _ & filters :as var] context]
-  (println "[process-var]" (pr-str var))
   (reduce
    (fn [acc [_ name param]]
      (apply-filter (filters/filter-for-name name) acc param context))
