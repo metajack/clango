@@ -74,11 +74,17 @@
        (format (str "%." precision "f") n))))
 
 (deffilter get [c k]
-  (core/get c k
-            (core/get c (str k)
-                      (core/get c (try
-                                    (Long/valueOf k)
-                                    (catch Exception e nil))))))
+  (let [g (fn [c k]
+            (try
+              (core/get c k)
+              (catch Exception e nil)))]
+    (if-let [v (g c k)]
+     v
+     (if-let [v (g c (str k))]
+       v
+       (g c (try
+              (Long/valueOf k)
+              (catch Exception e nil)))))))
 
 (deffilter join
   ([x]

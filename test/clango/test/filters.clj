@@ -147,6 +147,11 @@
   "{{ foo|get:'bar' }}"
   "baz")
 
+(deftest-template get-filter-numeric
+  {:foo (sorted-map 2012 "foo")}
+  "{{ foo|get:'2012' }}"
+  "foo")
+
 (deftest-template keys-filter
   {:foo {"foo" 1}}
   "{% for k in foo|keys %}{{ k }}.{% endfor %}"
