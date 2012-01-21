@@ -32,7 +32,7 @@
 (deffilter date [d :string format]
   (util/date-format d format))
 
-(deffilter dateparse [s :string format]
+(deffilter dateparse [:string s :string format]
   (util/date-parse s format))
 
 (deffilter default [:string s :string df]
