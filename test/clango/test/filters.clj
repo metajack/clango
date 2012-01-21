@@ -142,6 +142,16 @@
   "{{ foo|floatformat:-3 }} {{ bar|floatformat }} {{ baz|floatformat:2 }}"
   "1.234 42 13.00")
 
+(deftest-template get-filter
+  {:foo {"bar" "baz"}}
+  "{{ foo|get:'bar' }}"
+  "baz")
+
+(deftest-template keys-filter
+  {:foo {"foo" 1}}
+  "{% for k in foo|keys %}{{ k }}.{% endfor %}"
+  "foo.")
+
 (deftest-template truncatewords-filter
   {:foo "This is a <b>bold</b> sentence <i>don't you <a href=\"http://foo.baz.baz\">"}
   "{{ foo | truncatewords:10 }}"

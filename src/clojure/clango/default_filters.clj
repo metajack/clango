@@ -1,8 +1,6 @@
 (ns clango.default-filters
-  (:refer-clojure :exclude [first last reverse])
   (:use [clango.filters :only (deffilter)])
-  (:require [clojure.core :as core]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [clango.util :as util]
             [net.cgrand.enlive-html :as html])
   (:import [java.io StringReader]
@@ -54,13 +52,12 @@
   (let [abbrevs ["B" "kB" "MB" "GB" "TB"]
         sizes (take (count abbrevs) (iterate #(/ % 1000.0) size))
         zip (map (fn [x y] [x y]) sizes abbrevs)
-        [sz abr] (core/first (drop-while #(> (core/first %) 1000) zip))]
+        [sz abr] (first (drop-while #(> (first %) 1000) zip))]
     (if (integer? sz)
       (format "%d %s" sz abr)
       (format "%.1f %s" sz abr))))
 
-(deffilter first [s]
-  (core/first s))
+;; first filter from clojure core
 
 (deffilter fix-ampersands [:string s]
   (str/replace s #"&(?!\p{Alpha}+;)" "&amp;"))
@@ -80,8 +77,9 @@
   ([x :string s]
      (str/join s x)))
 
-(deffilter last [x]
-  (core/last x))
+;; keys filter from clojure.core
+
+;; last filter from clojure.core
 
 (deffilter length [x]
   (str (count x)))
@@ -89,8 +87,7 @@
 (deffilter limit [x :int n]
   (take n x))
 
-(deffilter reverse [x]
-  (core/reverse x))
+;; reverse filter from clojure.core
 
 (deffilter skip [x :int n]
   (drop n x))
