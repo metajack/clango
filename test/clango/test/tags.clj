@@ -23,7 +23,11 @@
     "raw-include.html.ctl"
     "asdf"
     "simple-include.html.ctl"
-    "{{ foo }}"}))
+    "{{ foo }}"
+    "two-block-parent.html.ctl"
+    "{% block title %}{% endblock %}{% block content %}{% endblock %}"
+    "one-empty.html.ctl"
+    "{% extends 'two-block-parent.html.ctl' %}{% block content %}asdf{% endblock %}"}))
 
 (deftest-template if-tag-false
   {:foo false}
@@ -223,6 +227,10 @@
 (deftest-extends none-block
   "child-nothing.html.ctl"
   "...")
+
+(deftest-extends empty-block
+  "one-empty.html.ctl"
+  "asdf")
 
 (deftest-extends super-block
   "child-super.html.ctl"

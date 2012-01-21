@@ -178,12 +178,14 @@
 (defn- expand-block [block]
   (loop [[b & bs] (first block)
          acc []]
-    (let [body (if (= b [:var [:. "block" "super"]])
-                 (expand-block (rest block))
-                 [b])]
-      (if (seq bs)
-        (recur bs (into acc body))
-        (into acc body)))))
+    (if b
+     (let [body (if (= b [:var [:. "block" "super"]])
+                  (expand-block (rest block))
+                  [b])]
+       (if (seq bs)
+         (recur bs (into acc body))
+         (into acc body)))
+     acc)))
 
 (defn render-block [ctx [tree data] stack]
   (if (::extends-root ctx)
