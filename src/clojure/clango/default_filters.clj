@@ -1,6 +1,8 @@
 (ns clango.default-filters
+  (:refer-clojure :exclude [get])
   (:use [clango.filters :only (deffilter)])
-  (:require [clojure.string :as str]
+  (:require [clojure.core :as core]
+            [clojure.string :as str]
             [clango.util :as util]
             [net.cgrand.enlive-html :as html])
   (:import [java.io StringReader]
@@ -70,6 +72,13 @@
                        0
                        (Math/abs p))]
        (format (str "%." precision "f") n))))
+
+(deffilter get [c k]
+  (core/get c k
+            (core/get c (str k)
+                      (core/get c (try
+                                    (Long/valueOf k)
+                                    (catch Exception e nil))))))
 
 (deffilter join
   ([x]
