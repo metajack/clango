@@ -34,6 +34,36 @@
         a (cons (str a) nil)
         :else nil)))))
 
+(defn trans-format [format]
+  (for [f (formatter-split format)]
+    (case f
+      "%A" "aa"
+      "%b" "MMM"
+      "%c" "yyyy-MM-dd'T'HH:mm:ss"
+      "%d" "dd"
+      "%D" "E"
+      "%F" "MMMM"
+      "%g" "h"
+      "%G" "H"
+      "%h" "hh"
+      "%H" "HH"
+      "%i" "mm"
+      "%j" "d"
+      "%l" "EEEE"
+      "%m" "MM"
+      "%M" "MMM"
+      "%n" "M"
+      "%O" "Z"
+      "%r" "E, d MMM yyyy HH:mm:ss Z"
+      "%s" "ss"
+      "%T" "zzz"
+      "%U" "S"
+      "%W" "w"
+      "%y" "yy"
+      "%Y" "yyyy"
+      "%z" "D"
+      (if (= f "'") "''" (str "'" f "'")))))
+
 (defn date-format [date format]
   (let [datestr (fn [s] (-> (SimpleDateFormat. s) (.format date)))
         pieces (for [f (formatter-split format)]
@@ -72,3 +102,8 @@
                    "%z" (datestr "D")
                    f))]
     (apply str pieces)))
+
+(defn date-parse [s format]
+  (let [fmt (apply str (trans-format format))]
+    (-> (SimpleDateFormat. fmt)
+        (.parse s))))

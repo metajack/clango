@@ -97,6 +97,11 @@
   "{{ date|date:'%Y%m%dT%H:%i:%s' }}"
   "20120201T14:15:16")
 
+(deftest-template dateparse-filter
+  {:foo "2012-01-20"}
+  "{{ foo|dateparse:'%Y-%m-%d'|date:'%m.%d.%Y' }}"
+  "01.20.2012")
+
 (deftest-template default-filter
   {:foo ""}
   "{{ foo|default:'asdf' }}"
