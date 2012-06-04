@@ -6,3 +6,6 @@ pom.xml
 .lein-deps-sum
 /src/java/*.tokens
 /src/java/*.java
+/autodoc/
+/target/
+/tmp/
