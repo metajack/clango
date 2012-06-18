@@ -10,16 +10,22 @@
            acc []]
       (if (= (.getType token) Token/EOF)
         acc
-        (recur (.nextToken lexer) (conj acc [(.getText token) (.getType token)]))))))
+        (recur (.nextToken lexer)
+               (conj acc [(.getText token) (.getType token)]))))))
 
-(defn ast [node]
+(defn ast [node & {:keys [file]}]
   (if (and (zero? (.getChildCount node))
            (.getParent node))
+    ;; return the bare text unless it's the root node
     (.getText node)
-    (let [children (map ast (.getChildren node))
+    (let [children (map #(ast % :file file) (.getChildren node))
           text (.getText node)]
       (if text
-        (cons (keyword (.toLowerCase text)) children)
+        (with-meta
+          (conj children (-> text .toLowerCase keyword))
+          {:file file
+           :line (.getLine node)
+           :pos (.getCharPositionInLine node)})
         children))))
 
 (defn token-name [type]
@@ -64,7 +70,7 @@
                                 (char (.c re))))
     (str "Unknown exception: " (.toString re))))
 
-(defn parse [s]
+(defn parse [s & {:keys [file]}]
   (let [ass (ANTLRStringStream. s)
         tl (TemplateLexer. ass)
         cts (CommonTokenStream. tl)
@@ -73,7 +79,7 @@
       (-> tp
           (.template)
           (.getTree)
-          (ast))
+          (ast :file file))
       (catch RecognitionException re
         (throw (Exception. (error-msg re tp))))
       (catch RuntimeException rte

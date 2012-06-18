@@ -13,10 +13,12 @@
      (memoize
       (fn [name]
         (try
-          (parser/parse (slurp (path-join root name)))
+          (let [path (path-join root name)]
+            (parser/parse (slurp path) :file name))
           (catch IOException e ""))))))
 
 (defn map-store [template-map]
   (memoize
    (fn [name]
-     (parser/parse (get template-map name "")))))
+     (parser/parse (get template-map name "")
+                   :file name))))
