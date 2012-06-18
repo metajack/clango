@@ -1,6 +1,6 @@
 (defproject clango "1.0.0-SNAPSHOT"
   :description "Django-style templates for Clojure"
-
+  :url "https://github.com/metajack/clango"
   :license {:name "Eclipse Public License - v 1.0"
             :url "http://www.eclipse.org/legal/epl-v10.html"
             :distribution :repo}
