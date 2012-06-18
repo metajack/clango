@@ -1,0 +1,25 @@
+#+style: <link rel="stylesheet" type="text/css" href="style.css" />
+#+options: num:nil toc:nil
+#+title: System Overview
+
+Clango renders templates into content. These templates typically come
+in the form of strings or files, and they contain directives to insert
+content dynamically when they are rendered.
+
+During template rendering, the template code can insert the values of
+variables, loop over collections, and many other things. These
+variables and collections are provided to the renderer as the
+rendering context. This context is a simple dictionary of names to
+values, the values of which might be integers, strings, or even lists
+and other dictionaries.
+
+Templates also support inheritance so that boiler plate content can be
+factored out into a template which is then specialized. Clango uses a
+template store to access other templates for inclusion or resolving
+inheritance. Two template stores are provided by default: the file
+store and the memory store.
+
+In summary, Clango takes a template, a context, and a store and
+renders dynamic content. This allows a clean separation between
+presentation logic and the underlying data that is needed for the
+presentation.

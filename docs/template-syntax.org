@@ -1,0 +1,170 @@
+#+style: <link rel="stylesheet" type="text/css" href="style.css" />
+#+options: num:nil toc:nil
+#+title: Template Syntax
+
+Clango has a simple syntax containing three forms that can be embedded
+in arbitrary content such as HTML or plain text. These are the [[#var-form][/var/
+form]], the [[#tag-form][/tag/ form]], and the [[#comment-form][/comment/ form]].
+
+The [[#var-form][/var/ form]] is used to insert an arbitrary, and optionally
+filtered, variable into the rendered output. It's similar to text
+substitution, but it has a few features which make it more powerful.
+
+The [[#tag-form][/tag/ form]] is used for control structures, branching, and defining
+inheritance. It's extremely flexible and can be made to do almost
+anything through extensions.
+
+The [[#comment-form][/comment/ form]] is just a way to prevent interpretation of the
+commented content. Anything appearing inside a *comment* form is
+removed from the rendered output.
+
+* /Var/ form
+  :PROPERTIES:
+  :CUSTOM_ID: var-form
+  :END:
+
+The var form does simple text substitution from a variable in the
+context. /var/ forms begin with ={{= and end with =}}=.
+
+/Var/ forms may also include a filtering chain that can transform the
+variable. Each filter is preceding by =|= and may take arguments which are
+separated by commas.
+
+Developers can extend Clango with their own filters as well. See
+[[file:custom-filters.org][custom filters]] for details.
+
+** Example usage
+
+*** Basic substitution
+
+#+begin_src clango
+Hello, {{ name }}!
+#+end_src
+
+Clango will replace ={{ name }}= with the value provided for the
+=name= variable in the context.
+
+*** Basic filtering
+
+#+begin_src clango
+Tbe length of foo is {{ foo|length }}.
+#+end_src
+
+The value of =foo= will be passed to length, and the result will
+appear in the rendered output.
+
+*** Filtering with arguments
+
+#+begin_src clango
+My cats' names are: {{ cats|join:', ' }}.
+#+end_src
+
+The value for the context variable =cats= will be passed to the =join=
+filter, which will interpose the given argument between each of the
+collections values. Parameters to filters are separated from the name
+of the filter by a colon and from each other by a comma.
+
+The rendered output will appear similar to the
+following given the context where =cats= is equal to =["Pica", "Lola"]=.
+
+#+begin_src text
+My cats' names are: Pica, Lola.
+#+end_src
+
+*** Chaining filters
+
+#+begin_src clango
+The top three votes are for: {{ contestants|limit:3|join:', ' }}.
+#+end_src
+
+The value of =contestants= is first passed to the =limit= filter,
+which limits the collection to the first 3 elements. The resulting
+collection is then passed to the =join= filter.
+
+This filter chaining allows complex transformations to be built from
+simple pieces.
+
+* /Tag/ form
+  :PROPERTIES:
+  :CUSTOM_ID: tag-form
+  :END:
+
+The /tag/ form is the most versatile of all the forms. An inline tag begins
+with ={%= and ends with =%}=. A block tag consists of an inline tag
+marking the beginning of the block, arbitrary content inside the
+block, and an inline tag marking the end of the block.
+
+Tags are most often used for control structures such as branching and
+looping, but can also be used for things like including partial
+templates or inheritance.
+
+Each tag defines its own internal syntax, although Clango tries to
+enforce some consistency and promote reuse of syntax pieces.
+
+** Example usage
+
+*** If tag
+
+#+begin_src clango
+<ul class="nav">
+  <li><a href="/home">Home</a></li>
+  {% if user.is_admin %}
+  <li><a href="/admin">Admin</a></li>
+  {% endif %}
+  <li><a href="/logout">Log out</a></li>
+</ul>
+#+end_src
+
+This example shows the =if= block tag, which starts with =if= and ends
+with =endif=. The content in between will only be evaluated and
+rendered if the predicate (in this case, =user.is_admin=) is true.
+
+*** For tag
+
+#+begin_src clango
+<ul>
+{% for l in links %}
+<li><a href="{{ l.location }}">{{ l.name }}</a></li>
+{% endfor %}
+</ul>
+#+end_src
+
+The =for= block tag enumerates each element of the =links= collection,
+assigns it to the local variable =l=, and the evaluates the contents
+of the block.
+
+*** Include tag
+
+#+begin_src clango
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello!</title>
+  </head>
+  <body>
+    {% include 'body.html.ctl' %}
+  </body>
+</html>
+#+end_src
+
+The =include= inline tag is replaced by the contents of another
+rendered template.
+
+* /Comment/ form
+  :PROPERTIES:
+  :CUSTOM_ID: comment-form
+  :END:
+
+The /comment/ form beings with ={#= and ends with =#}=. Comments
+cannot be nested.
+
+Anything included in the comment is removed from the template during
+parsing and will not show up in the rendered output.
+
+** Example usage
+
+#+begin_src clango
+Hello, world!
+{# This is a comment. #}
+Goodbye, world!
+#+end_src

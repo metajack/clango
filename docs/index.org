@@ -1,0 +1,54 @@
+#+style: <link rel="stylesheet" type="text/css" href="style.css" />
+#+options: num:nil toc:nil
+#+title: Clango Templates
+
+Clango is a templating language and library for [[http://clojure.org/][Clojure]] similar to
+[[https://docs.djangoproject.com/en/1.3/topics/templates/][Django's templates]] or [[http://liquidmarkup.org/][Ruby's Liquid]]. It supports template inheritance,
+and basic filtering and control structures. It is ideal for use where control
+over the template's context is not typically under the template
+author's control, which makes it more useful for providing an
+extension point for end users unfamiliar with Clojure than an
+alternative like [[https://github.com/cgrand/enlive][Enlive]], [[https://github.com/Flamefork/fleet][Fleet]], or [[https://github.com/fhd/clostache][Mustache]].
+
+It is mostly compatible with Django template and somewhat compatible
+with Liquid, but there are a few deviations.
+
+* Table of Contents
+
+** [[file:index.org][Introduction]]
+   
+** [[file:system-overview.org][System Overview]]
+
+** [[file:authoring.org][Authoring with Clango]]
+
+- [[file:template-syntax.org][Template syntax]]
+- [[file:standard-tags.org][Standard tags]]
+- [[file:standard-filters.org][Standard filters]]
+
+** [[file:developer.org][Developing with Clango]]
+
+- [[file:rendering-api.org][Rendering API]]
+- [[file:custom-stores.org][Custom template stores]]
+- [[file:custom-filters.org][Custom filters]]
+- [[file:custom-tags.org][Custom tags]]
+
+* What Templates Look Like
+
+This is what a basic template looks like:
+
+#+include: "../examples/getting-started.html.ctl" src html
+
+More information about Clango's syntax and built in tags and features
+can be found on the [[file:authoring.org][authoring]] page.
+
+* How To Integrate Clango
+
+Clango is very easy to use from your Clojure code. Here's a basic
+example which renders a string template:
+
+#+include: "../examples/hello_clango.clj" src clojure
+
+More information about how to use Clango from your code as well as how
+to develop custom filters, tags, and template stores can be found on
+the [[file:developer.org][developer]] page.
+

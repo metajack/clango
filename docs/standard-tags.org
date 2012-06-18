@@ -1,0 +1,79 @@
+#+style: <link rel="stylesheet" type="text/css" href="style.css" />
+#+options: num:nil toc:nil
+#+title: Standard Tags
+
+The following tags are included with Clango.
+
+* block
+  :PROPERTIES:
+  :CUSTOM-ID: block-tag
+  :END:
+
+The /block/ tag is used with template inheritance. It defines a named
+block which override the contents of blocks of the same name in
+ancestor templates.
+
+The contents of the block will be rendered in the position at which it
+first appears in the inheritance tree.
+
+** Examples
+
+* extends
+  :PROPERTIES:
+  :CUSTOM-ID: extends-tag
+  :END:
+
+The /extends/ tag is used with template inheritance. It defines that
+the template in which it appears is a descendant of some parent
+template. Any [[#block-tag][/block/]] tags which are defined in the descendant will
+override the contents of correspondingly named blocks in the
+inheritance tree.
+
+** Examples
+
+* for
+  :PROPERTIES:
+  :CUSTOM-ID: for-tag
+  :END:
+
+The /for/ tag renders the contents of the block zero or more times,
+once for each item in the given collection. Each time the block's
+contents are rendered, the variable given in the tag is assigned to
+the current item in the collection.
+
+** Examples
+
+* if
+  :PROPERTIES:
+  :CUSTOM-ID: if-tag
+  :END:
+
+The /if/ tag evaluates a test condition, and if the result is true,
+evaluates the contents of the block. If an else block is provided, it
+is evaluated with the result of the test condition are false.
+
+** Example
+
+#+begin_src clango
+Hello, {% if name %}{{ name }}{% else %}anonymous{% endif %}!
+#+end_src
+
+* include
+  :PROPERTIES:
+  :CUSTOM-ID: include-tag
+  :END:
+
+The /include/ tag causes another template to be evaluated and rendered
+where the tag appears. These included templates are sometimes referred
+to as partials in other templating systems.
+
+** Examples
+
+* with
+  :PROPERTIES:
+  :CUSTOM-ID: with-tag
+  :END:
+
+The /with/ tag defines new local variables within a block.
+
+** Examples
