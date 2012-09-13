@@ -1,5 +1,5 @@
 (ns clango.util
-  (:require [clojure.string :as str]
+  (:require [clojure.string :as string]
             [clango.parser :as parser])
   (:import [java.util Calendar]
            [java.text SimpleDateFormat]))
@@ -69,7 +69,7 @@
         pieces (for [f (formatter-split format)]
                  (case f
                    "%A" (datestr "aa")
-                   "%b" (str/lower-case (datestr "MMM"))
+                   "%b" (string/lower-case (datestr "MMM"))
                    ;; separate timezone hour and minute by ":" to
                    ;; conform to IETF restricted subset of ISO8601,
                    ;; which is used in Atom
