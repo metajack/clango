@@ -15,10 +15,10 @@
           (when-let [n (try (Long/valueOf b) (catch Exception e))]
             (get (lookup context a) n))))
       (recur context (second ident)))
-    (let [res ((keyword ident) context)]
-      (try
-        @res
-       (catch Exception e res)))))
+    (let [res1 ((keyword ident) context)
+          res2 ((keyword (string/replace ident #"_" "-")) context)
+          maybe-deref #(try @% (catch Exception e %))]
+      (or (maybe-deref res1) (maybe-deref res2)))))
 
 (defn get-template [name ctx]
   (if-let [store (:clango.core/template-store ctx)]
