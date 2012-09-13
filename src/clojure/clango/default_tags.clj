@@ -78,7 +78,7 @@
                 (= [:var "not"] n) [:sym "not"]
                 (= [:var "and"] n) [:sym "and"]
                 (= [:var "or"] n) [:sym "or"]
-                :else (let [v (var/value-of n ctx)]
+                :else (let [v (var/process-var n ctx)]
                         (if (sequential? v)
                           (seq v)
                           v))))
